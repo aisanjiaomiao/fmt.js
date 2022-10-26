@@ -22,7 +22,7 @@ const isEmpty = v => [undefined, null].includes(v) || (typeof v == 'number' && i
  * @return {String}
  */
 const templateEngine = (tpl, data, conf) => {
-    let [_s, _e, _re, state] = ['#{', '}', null, {}]
+    let [_s, _e, _re, state] = ['#{', '}', null, {}],match
     if (conf) {
         if (conf.constructor === RegExp) _re = conf
         else if (conf.constructor == Object) {
