@@ -8,18 +8,14 @@ export const isDayjsObject = v => (typeof v == 'object' ? dayjs().constructor ==
 // 是否ISO_8601日期格式字符串
 export const isIso8601 = v => typeof v == 'string' && v.trim().length > 19 && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i.test(v)
 // 是否空对象
-export const isEmptyObject = obj => {
-    if (isEmpty(obj)) return true
-    for (var n in obj) if (obj.hasOwnProperty(n) && obj[n]) return false
-    return true
-}
+const isEmptyObject = v => (typeof v=="object"&&!Object.keys(v).length)&& JSON.stringify(v) == "{}"
 // 是否空
-export const isEmpty = v => [undefined, null].includes(v) || (typeof v == 'number' && isNaN(v)) || (typeof v == 'string' && !v.trim()) || (Array.isArray(v) && !v.length)
+const isEmpty = v => [undefined, null].includes(v) || (typeof v == 'number' && isNaN(v)) || (typeof v == 'string' && !v.trim()) || (Array.isArray(v) && !v.length) || isEmptyObject(v)
 /**
  * @desc  模板引擎
  * @param  {String}           tpl    模板字符串
  * @param  {Object|Function}  data   替换文字或自定义替换函数
- * @param  {RegExp|Object}    conf
+ * @param  {RegExp|Object}    conf   模板引擎配置，例如正则规则，模板符号
  * @return {String}
  */
  export const templateEngine = (tpl, data, conf) => {
@@ -36,34 +32,12 @@ export const isEmpty = v => [undefined, null].includes(v) || (typeof v == 'numbe
     if (!_re) _re = new RegExp(String.raw`${_s}(.+?)${_e}`, 'g')
     tpl = tpl.replaceAll(_s + _e, '')
     while ((match = _re.exec(tpl))) {
-        tpl = tpl.replace(match[0], typeof data == 'function' ? (m, $1) => data(match[1], { m, $1, _s, _e, state }) : data[match[1]])
+        tpl = tpl.replace(match[0], typeof data == 'function' ? (m, $1) => data(match[1], { m, $1, _s, _e, state }) : match[1].split('.').map(v=>v.trim()).reduce((v, k ) => (v && v[k] ? v[k] : null),data) )
         _re.lastIndex = 0
     }
     return tpl
 }
-/*
-        格式化
-| 简写      | 关键字         | 含义                   | 参数说明 |
-| --------- | -------------- | ---------------------- | -------- |
-| n         | number,num     | 数字                   |          |
-| f         | float          | 浮点                   |          |
-| p         | percentage,per | 百分比                 |          |
-| d         | date,datetime  | 日期                   |          |
-| wk        | weekday        | 星期                   |          |
-| padStart  | padStart       | 值左侧补全             |          |
-| padEnd    | padEnd         | 值右侧补全             |          |
-| 0         | zero           | 数字补全 0             |          |
-| up        | upperCase      | 转大写                 |          |
-| low       | lowerCase      | 转小写                 |          |
-| ts        | timeStamp      | 时间戳                 |          |
-| unix      | unixTimeStamp  | unix 时间戳            |          |
-| attr      | prop , field   | 从对象中读取属性       |          |
-| dict      |                | 字典匹配               |          |
-| join      |                | 数字或驼峰转换连续字符 |          |
-| hump      |                | 连续字符转换驼峰       |          |
-| dict      |                | 字典                   |          |
-| dateRange |                | 时间范围               |          |
-    */
+/* 格式化 */
 export const methods = {
     undefined: { f: v => v },
     /*  简写: {f: 格式化函数 ,kw:[ 关联关键字 ]}  */
@@ -80,7 +54,7 @@ export const methods = {
     unix: { f: v => +dayjs(v).endOf('day').unix(), kw: ['unixTimeStamp'] },
     padStart: { f: (v, ...args) => String(v).padStart(args[0], args[1] || ' ') },
     padEnd: { f: (v, ...args) => String(v).padEnd(args[0], args[1] || ' ') },
-    attr: { f: (v, keys, str = null) => keys.split('.').reduce((value, currentKey, currentIndex, arr) => (value && value[currentKey] ? value[currentKey] : null), v) || str, kw: ['prop', 'field'] },
+    attr: { f: (v, keys, str = null) => keys.split('.').map(v=>v.trim()).reduce((value, currentKey, currentIndex, arr) => (value && value[currentKey] ? value[currentKey] : null), v) || str, kw: ['prop', 'field'] },
     join: { f: (v, c = '-') => (Array.isArray(v) ? v.join(c) : v.replace(/([A-Z])/g, c + '$1').toLowerCase()) },
     hump: { f: v => v.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : '')) },
     dict: { f: (v, ds, p) => (typeof ds == 'string' ? ds.split(p || '/') : ds)[v] },
@@ -91,7 +65,7 @@ export const methods = {
  * @param {String|Number} prop 搜索关键字
  * @return {Function}
  */
- export const findMethod = (prop) => {
+export const findMethod = (prop) => {
     let fmt = methods[prop]
     if (!fmt) {
         let k = Object.keys(methods).find(k => methods[k].kw && methods[k].kw.includes(prop))
@@ -102,7 +76,7 @@ export const methods = {
 /**
  * @desc  根据函数格式化  
  */
- export const formatMethods = new Proxy({}, { get: (target, prop, receiver) => findMethod(prop) })
+export const formatMethods = new Proxy({}, { get: (target, prop, receiver) => findMethod(prop) })
 /* 格式化方式匹配 */
 export const matchFormatMethod = {
     /**
@@ -163,7 +137,7 @@ export const matchFormatMethod = {
  * @param {Any} 自定义格式化相关配置或参数
  * @return {Any}
  */
- export const valueFormat = (...args) => {
+export const valueFormat = (...args) => {
     if (args.length == 0) return undefined
     const val = args[0]
     if (args.length == 1) return val
@@ -183,6 +157,5 @@ export const matchFormatMethod = {
  * @param {Any}      value   被格式化值
  * @return {Any}
  */
- export const formatValue = (...args) => {
-    return valueFormat(args[1], args[0], ...args.slice(2))
-}
+export const formatValue = (...args) =>  valueFormat(args[1], args[0], ...args.slice(2))
+ 
