@@ -78,14 +78,14 @@ ESM项目中，例如在Vue项目中，使用 **fmt.esm.js** 例如: `import { v
 **matchFormatMethod** 主要是为 **[valueFormat](#valueFormat)** 与 **[formatValue](#formatValue)** 函数作为对传入模板的数据类型来区分实际操作流程。
 
 #### 函数 / 方法
-- [isDayjsObject](#isDayjsObject)
-- [isIso8601](#isIso8601)
-- [isEmptyObject](#isEmptyObject)
-- [isEmpty](#isEmpty)
-- [templateEngine](#templateEngine)
-- [findMethod](#findMethod) 
-- [valueFormat](#valueFormat)
-- [formatValue](#formatValue)
+- [isDayjsObject](#isDayjsObjectvalue)
+- [isIso8601](#isIso8601value)
+- [isEmptyObject](#isEmptyObjectvalue)
+- [isEmpty](#isEmptyvalue)
+- [templateEngine](#formatvalueformatvalueargs)
+- [findMethod](#formatvalueformatvalueargs) 
+- [valueFormat](#formatvalueformatvalueargs)
+- [formatValue](#formatvalueformatvalueargs)
 
 ##### isDayjsObject(value)
 
