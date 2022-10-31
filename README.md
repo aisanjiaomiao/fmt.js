@@ -41,18 +41,23 @@ ESM项目中，例如在Vue项目中，使用 **fmt.esm.js** 例如: `import { v
 
 | 简写      | 关键字         | 含义                   | 参数说明 |
 | --------- | -------------- | ---------------------- | -------- |
+| 0         | zero           | 数字补全 0             |  值,补全长度        |
+| +         | number,num     | 数字                   |  加        |
+| -         | number,num     | 数字                   |   减       |
+| *         | number,num     | 数字                   |    乘      |
+| /         | number,num     | 数字                   |      除    |
 | n         | number,num     | 数字                   |          |
 | f         | float          | 浮点                   |          |
 | p         | percentage,per | 百分比                 |          |
 | d         | date,datetime  | 日期                   |          |
 | wk        | weekday        | 星期                   |          |
-| padStart  | padStart       | 值左侧补全             |          |
-| padEnd    | padEnd         | 值右侧补全             |          |
-| 0         | zero           | 数字补全 0             |          |
 | up        | upperCase      | 转大写                 |          |
 | low       | lowerCase      | 转小写                 |          |
+| len       | length         | 获取长度                 |          |
 | ts        | timeStamp      | 时间戳                 |          |
 | unix      | unixTimeStamp  | unix 时间戳            |          |
+| padStart  | padStart       | 值左侧补全             |          |
+| padEnd    | padEnd         | 值右侧补全             |          |
 | attr      | prop , field   | 从对象中读取属性       |          |
 | dict      |                | 字典匹配               |          |
 | join      |                | 数字或驼峰转换连续字符 |          |
