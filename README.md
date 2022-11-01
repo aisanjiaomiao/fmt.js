@@ -68,15 +68,15 @@ ESM项目中，例如在Vue项目中，使用 **fmt.esm.js** 例如: `import { v
 
 ##### formatMethods
 
-**formatMethods** 为 **[methods](#methods)**的代理对象，主要作用是讲访问函数自动根据函数的简称或关键字来匹配到格式化函数。
+**formatMethods** 为 [methods](#methods)的代理对象，主要作用是讲访问函数自动根据函数的简称或关键字来匹配到格式化函数。
 
 例如格式化百分比函数，既可以使用`formatMethods.p`来访问，也可以通过`formatMethods.per`、`formatMethods.percentage`这种关键字的方式来访问
 
-实现原理查看函数**[findMethod](#findMethod)**
+实现原理查看函数[findMethod](#findMethod)
 
 ##### matchFormatMethod
 
-**matchFormatMethod** 主要是为 **[valueFormat](#valueFormat)** 与 **[formatValue](#formatValue)** 函数作为对传入模板的数据类型来区分实际操作流程。
+**matchFormatMethod** 主要是为  [valueFormat](#valueFormat)  与  [formatValue](#formatValue)  函数作为对传入模板的数据类型来区分实际操作流程。
 
 #### 函数 / 方法
 - [isDayjsObject](#isDayjsObjectvalue)
@@ -261,7 +261,7 @@ console.log(ret)
 ```
 
 ##### formatValue(format,value[,...args])
-格式化值函数，与**[#valueFormat](#valueFormat)**功能一样，区别只是在于前两个参数顺序不同
+格式化值函数，与[#valueFormat](#valueFormat)功能一样，区别只是在于前两个参数顺序不同
 
 
 参数: 
@@ -490,4 +490,4 @@ columns: [
 ```
 
 
-#### 更多使用示例查看 **[example](example/demo_1.html)**
+#### 更多使用示例查看 [example](example/demo_1.html)
