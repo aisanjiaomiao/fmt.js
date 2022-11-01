@@ -41,29 +41,30 @@ ESM项目中，例如在Vue项目中，使用 **fmt.esm.js** 例如: `import { v
 
 | 简写      | 关键字         | 含义                   | 参数说明 |
 | --------- | -------------- | ---------------------- | -------- |
-| 0         | zero           | 数字补全 0             |  值,补全长度        |
-| +         | number,num     | 数字                   |  加        |
-| -         | number,num     | 数字                   |   减       |
-| *         | number,num     | 数字                   |    乘      |
-| /         | number,num     | 数字                   |      除    |
-| n         | number,num     | 数字                   |          |
-| f         | float          | 浮点                   |          |
-| p         | percentage,per | 百分比                 |          |
-| d         | date,datetime  | 日期                   |          |
-| wk        | weekday        | 星期                   |          |
-| up        | upperCase      | 转大写                 |          |
-| low       | lowerCase      | 转小写                 |          |
-| len       | length         | 获取长度                 |          |
-| ts        | timeStamp      | 时间戳                 |          |
-| unix      | unixTimeStamp  | unix 时间戳            |          |
-| padStart  | padStart       | 值左侧补全             |          |
-| padEnd    | padEnd         | 值右侧补全             |          |
-| attr      | prop , field   | 从对象中读取属性       |          |
-| dict      |                | 字典匹配               |          |
-| join      |                | 数字或驼峰转换连续字符 |          |
-| hump      |                | 连续字符转换驼峰       |          |
-| dict      |                | 字典                   |          |
-| dateRange |                | 时间范围               |          |
+| 0         | zero           | 数字补全 0             |  v:值, len:补全长度        |
+| +         | number,num     |  加        |              v:值, ...args:追加值         |
+| -         | number,num     |  减       |               v:值,  ...args:追加值       |
+| *         | number,num     |  乘      |                v:值, ...args:追加值       |
+| /         | number,num     |  除    |                  v:值, ...args:追加值     |
+| n         | number,num     | 数字                   |  v:值, len: 隔位添加逗号类似(10,000,000) |
+| f         | float          | 浮点                   |  v:值, fx:保留几位小数          |
+| p         | percentage,per | 百分比                 |  v:值, fx:保留几位小数, c:末尾字符，默认"%"          |
+| d         | date,datetime  | 日期                   |  v:值, f:格式,参考[示例](#项目中的使用)或参考[dayjs文档](https://dayjs.fenxianglu.cn/category/parse.html#实例)          |
+| wk        | weekday        | 星期                   |  v:值, zh: 是否显示中文星期         |
+| up        | upperCase      | 转大写                 |  v:值,          |
+| low       | lowerCase      | 转小写                 |  v:值,           |
+| len       | length         | 获取长度               |    v:值,           |
+| ts        | timeStamp      | 时间戳                 |  v:值, exact:精确度，例如mysql中的Date毫秒会自动四舍五入，此时精确度会设置为3       |
+| unix      | unixTimeStamp  | unix 时间戳(秒级时间戳)           |  v:值,         |
+| padStart  | padStart       | 值左侧补全             |  v:值, c:补全的字符         |
+| padEnd    | padEnd         | 值右侧补全             |  v:值, c:补全的字符          |
+| attr      | prop , field   | 从对象中读取属性       |  v:值, keys: 键字符例如"key1.key2.key3", str: 默认空显示值        |
+| join      |                | 数组或驼峰转换连续字符       |  v:值, c:拼接字符        |
+| dict      |                | 字典匹配               |  v:值, ds:字符串或对象 , p:字符串时split分割字符        |
+| hump      |                | 连续字符转换驼峰       |  v:值,         |
+| [dateRange](#dateRange) |                | 时间范围               |  v:值, d:计算起始值默认以天(day)为单位, k:自定义格式化的key         |
+
+部分格式化函数使用参考:[内置格式化函数附加示例](#内置格式化函数附加示例)
 
 ##### formatMethods
 
@@ -364,6 +365,80 @@ valueFormat({ a: 111, b: { c: 0.0222 }, e: { f: { g: new Date() } } }, 'a= #{ pr
 
 ```
  
+### 内置格式化函数附加示例
+
+#### dict
+
+说明：字典项目匹配
+
+以下为浏览器控制台使用示例：
+
+```js
+< formatMethods.dict(1,'否/是')
+> '是'
+
+< formatMethods.dict(0,'否/是')
+> '否'
+
+< formatMethods.dict(0,'否、是','、')
+> '否'
+
+< formatMethods.dict(1,'否、是','、')
+> '是'
+
+< formatMethods.dict(0,['N','Y'])
+> 'N'
+
+> formatMethods.dict(1,['N','Y'])
+< 'Y'
+
+> formatMethods.dict(3,{ 1: '早餐', 2: '中餐', 3: '晚餐', 4: '夜宵' })
+< '晚餐'
+```
+
+#### dateRange
+说明：获取时间范围  
+
+以下为浏览器控制台使用示例：
+```js
+// 返回当日dayjs 数组
+> formatMethods.dateRange(new Date,)
+< (2) [M, M]
+// 获取当月时间范围格式化输出
+> formatMethods.dateRange(new Date,"month","d:2")
+< (2) ['2022-11-01 00:00', '2022-11-30 23:59']
+// 获取当日时间范围时间戳
+> formatMethods.dateRange(new Date,false,'n')
+< (2) [1667232000000, 1667318399999]
+// 获取当日时间范围秒级精度时间戳
+> formatMethods.dateRange(new Date,false,'ts:3')
+< (2) [1667232000000, 1667318399000]
+// 获取当日时间范围秒级时间戳
+> formatMethods.dateRange(new Date,false,'unix')
+< (2) [1667318399, 1667318399]
+// 获取时间戳范围并格式化输出
+> formatMethods.dateRange([+new Date-86400000*2,+new Date],false,'d:2')
+< (2) ['2022-10-30 00:00', '2022-11-01 23:59']
+```
+
+#### attr
+
+关键字：prop , field   
+说明：从对象中读取属性  
+
+以下为浏览器控制台使用示例：
+```js
+> formatMethods.attr({ a: 111, b: { c: 0.0222 }, e: { f: { g: new Date() } } },"e.f.g")
+< Tue Nov 01 2022 23:39:17 GMT+0800 (中国标准时间)
+// 空值默认值显示
+> formatMethods.attr({ a: 111, b: { c: 0.0222 }, e: { f: { g: new Date() } } },"e.f.a","--")
+< '--'
+
+> formatMethods.attr({ a: 111, b: { c: 0.0222 }, e: { f: { g:0 } } },"e.f.g","--")
+< 0
+
+```
+
 
 
 

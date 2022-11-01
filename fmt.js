@@ -57,11 +57,14 @@ const methods = {
     unix: { f: v => +dayjs(v).endOf('day').unix(), kw: ['unixTimeStamp'] },
     padStart: { f: (v, ...args) => String(v).padStart(args[0], args[1] || ' ') },
     padEnd: { f: (v, ...args) => String(v).padEnd(args[0], args[1] || ' ') },
-    attr: { f: (v, keys, str = null) => keys.split('.').map(v=>v.trim()).reduce((value, currentKey, currentIndex, arr) => (value && value[currentKey] ? value[currentKey] : null), v) || str, kw: ['prop', 'field'] },
+    attr: { f: (v, keys, str = null) => { 
+       let val= keys.split('.').map(v=>v.trim()).reduce((value, currentKey, currentIndex, arr) => (value && !isEmpty(value[currentKey]) ? value[currentKey] : null), v)
+       return  isEmpty(val)?str:val;
+    }, kw: ['prop', 'field'] },
     join: { f: (v, c = '-') => (Array.isArray(v) ? v.join(c) : v.replace(/([A-Z])/g, c + '$1').toLowerCase()) },
     hump: { f: v => v.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : '')) },
     dict: { f: (v, ds, p) => (typeof ds == 'string' ? ds.split(p || '/') : ds)[v] },
-    dateRange: { f: (v, d, k) => (Array.isArray(v) ? (v.length > 1 ? v[0] : v[1]) : [v, v]).map((_, i) => findMethod(k)(dayjs(_)[(i == 0 ? 'start' : 'end') + 'Of'](d || 'day'))) },
+    dateRange: { f: (v, d, k) => (Array.isArray(v) ? (v.length > 1 ?[v[0] ,v[1]] : [v[0] ,v[0]]) : [v, v]).map((_, i) => matchFormatMethod.string((dayjs(_)[(i == 0 ? 'start' : 'end') + 'Of'](d || 'day') ) ,k,)  ) },
 }
 /**
  * @desc  根据关键字查询函数
@@ -97,7 +100,7 @@ const matchFormatMethod = {
      * @return {Any}
      */
     string: (oVal, strFormat, templConf) => {
-        if (!strFormat.trim()) return oVal
+        if (!strFormat||!strFormat.trim()) return oVal
         let val = typeof oVal == 'function' ? oVal() : oVal // 防止变量污染
         if (isEmpty(val)) return
         const exec = (val, batchStr, def) => {
